@@ -1,0 +1,24 @@
+# from http://stackoverflow.com/questions/18496940/how-to-deal-with-persistent-storage-e-g-databases-in-docker
+# by http://stackoverflow.com/users/243806/toast38coza
+
+version: "2"
+
+services:
+  db:
+    restart: on-failure:10
+    image: postgres:9.4
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+  web:
+    restart: on-failure:10
+    build: .
+    command: gunicorn mypythonapp.wsgi:application -b :8000 --reload
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    links:
+      - db
+
+volumes:
+  db-data:
